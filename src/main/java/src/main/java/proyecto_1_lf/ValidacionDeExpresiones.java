@@ -120,7 +120,7 @@ public class ValidacionDeExpresiones {
     boolean verificarError(List<String> lines) {
         System.out.println("Debug: Verifying ERROR section.");
 
-        Pattern p = Pattern.compile("\\s*=\\s*(\\d+)");
+        Pattern p = Pattern.compile("\\s*ERROR=\\s*(\\d+)");
 
         int lineNumber = 0;
         for (String line : lines) {
