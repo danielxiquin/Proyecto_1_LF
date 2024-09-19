@@ -10,7 +10,7 @@ public class ValidacionDeExpresiones {
 
     boolean verificarSet(BufferedReader reader) throws Exception{
         //Colocar las expresion para validar SET
-        Pattern p = Pattern.compile("");
+        Pattern p = Pattern.compile("[a-zA-Z]");
         String line = "";
 
         while ((line = reader.readLine()) != null) {
