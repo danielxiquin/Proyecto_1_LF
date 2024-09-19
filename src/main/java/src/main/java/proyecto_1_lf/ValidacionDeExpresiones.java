@@ -1,13 +1,10 @@
 package src.main.java.proyecto_1_lf;
 
-import java.io.BufferedReader;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ValidacionDeExpresiones {
-
-    final String regexSets = "";
-
 
     // Method to get the column number of the first match failure
     private int getErrorColumn(String line, Pattern p) {
@@ -28,42 +25,26 @@ public class ValidacionDeExpresiones {
         System.out.println();
     }
 
-    boolean verificarSet(BufferedReader reader) throws Exception {
-        // Updated regex to handle both single characters and ranges
+    boolean verificarSet(List<String> lines) {
+        System.out.println("Debug: Verifying SETS section.");
+
         Pattern p = Pattern.compile("\\s*([A-Z_]+)\\s*=\\s*'([A-Za-z0-9_])'\\s*\\.\\.\\s*'([A-Za-z0-9_])'(\\s*\\+\\s*('([A-Za-z0-9_])'|('([A-Za-z0-9_])'\\s*\\.\\.\\s*'([A-Za-z0-9_])')))*\\s*|\\s*([A-Z_]+)\\s*=\\s*CHR\\(\\d+\\)\\s*\\.\\.\\s*CHR\\(\\d+\\)\\s*");
 
-        String line = "";
-        int lineNumber = 0; // Track line number
-
-        while ((line = reader.readLine()) != null) {
-            lineNumber++; // Increment line number
+        int lineNumber = 0;
+        for (String line : lines) {
+            lineNumber++;
             System.out.println("Debug: Reading line " + lineNumber + ": " + line);
-            logAsciiValues(line);  // Log ASCII values for debugging
+            logAsciiValues(line);
 
-            // If the line is the start of another section, break the loop and return to the main function
-            if (line.trim().startsWith("TOKENS") || line.trim().startsWith("ACTIONS") || line.trim().startsWith("ERROR")) {
-                System.out.println("Debug: End of SETS section. Returning control.");
-                return true;
-            }
-
-            // Remove all whitespace (spaces, tabs, etc.)
+            // Clean the line and check against the regular expression
             String cleanedLine = removeWhitespace(line);
             System.out.println("Debug: Cleaned line: " + cleanedLine);
 
-            // Print the regular expression
-            System.out.println("Debug: Regular Expression: " + p.toString());
-
-            if (cleanedLine.isEmpty()) {
-                System.out.println("Debug: Skipping empty line.");
-                continue;  // Skip empty lines
-            }
-
             Matcher m = p.matcher(cleanedLine);
             boolean isMatching = m.matches();
-            System.out.println("Debug: Matching result for line " + lineNumber + ": " + isMatching);  // Log whether the regex matched the cleaned line
+            System.out.println("Debug: Matching result for line " + lineNumber + ": " + isMatching);
 
             if (!isMatching) {
-                // Get the error column and show a more detailed message
                 int errorColumn = getErrorColumn(line, p);
                 System.out.println("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
                 return false;
@@ -74,63 +55,87 @@ public class ValidacionDeExpresiones {
         return true;
     }
 
-    // Function to remove all whitespace from a line
+
+    boolean verificarTokens(List<String> lines) {
+        System.out.println("Debug: Verifying TOKENS section.");
+
+        // Updated regular expression for TOKEN lines, including support for parentheses and functions
+        Pattern p = Pattern.compile("\\s*TOKEN\\s+(\\d+)\\s*=\\s*([A-Za-z0-9_'\"()*+?|\\s-]+|'([^']|'')*'|\"[^\"]*\"|\\([A-Za-z0-9_'\"\\s|*+?]+\\)|\\{\\s*[A-Za-z0-9_]+\\(\\)\\s*}|\\(\\s*[A-Za-z0-9_'\"\\s|*+?]+\\s*\\)\\s*)");
+
+        int lineNumber = 0;
+        for (String line : lines) {
+            lineNumber++;
+            System.out.println("Debug: Reading line " + lineNumber + ": " + line);
+
+            Matcher m = p.matcher(line);
+            boolean isMatching = m.matches();
+            System.out.println("Debug: Matching result for line " + lineNumber + ": " + isMatching);
+
+            if (!isMatching) {
+                System.out.println("Error in line " + lineNumber + ": " + line);
+                return false;
+            } else {
+                System.out.println("Debug: Line " + lineNumber + " passed validation.");
+            }
+        }
+        return true;
+    }
+
+
+
+
+
+    boolean verificarActions(List<String> lines) {
+        System.out.println("Debug: Verifying ACTIONS section.");
+
+        Pattern p = Pattern.compile("(\\d+\\s*=\\s*'[A-Za-z0-9]+(?:'[A-Za-z0-9])'|RESERVADAS\\(\\))");
+
+        int lineNumber = 0;
+        for (String line : lines) {
+            lineNumber++;
+            System.out.println("Debug: Reading line " + lineNumber + ": " + line);
+
+            Matcher m = p.matcher(line);
+            boolean isMatching = m.matches();
+            System.out.println("Debug: Matching result for line " + lineNumber + ": " + isMatching);
+
+            if (!isMatching) {
+                int errorColumn = getErrorColumn(line, p);
+                System.out.println("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
+                return false;
+            } else {
+                System.out.println("Debug: Line " + lineNumber + " passed validation.");
+            }
+        }
+        return true;
+    }
+
+    boolean verificarError(List<String> lines) {
+        System.out.println("Debug: Verifying ERROR section.");
+
+        Pattern p = Pattern.compile("\\s*=\\s*(\\d+)");
+
+        int lineNumber = 0;
+        for (String line : lines) {
+            lineNumber++;
+            System.out.println("Debug: Reading line " + lineNumber + ": " + line);
+
+            Matcher m = p.matcher(line);
+            boolean isMatching = m.matches();
+            System.out.println("Debug: Matching result for line " + lineNumber + ": " + isMatching);
+
+            if (!isMatching) {
+                int errorColumn = getErrorColumn(line, p);
+                System.out.println("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
+                return false;
+            } else {
+                System.out.println("Debug: Line " + lineNumber + " passed validation.");
+            }
+        }
+        return true;
+    }
+
     private String removeWhitespace(String line) {
         return line.replaceAll("\\s+", "");  // Replace all whitespace (spaces, tabs, etc.) with nothing
     }
-
-    boolean verificarTokens(BufferedReader reader) throws Exception {
-        Pattern p = Pattern.compile("\\s+(\\d+)\\s*=\\s*((LETRA\\s*\\(\\s*LETRA\\s*\\|\\s*DIGITO\\s*\\)\\s*\\)\\s*\\{\\s*RESERVADAS\\(\\)\\s*\\})|('(?:[^']*)')|(\"(?:[^\"]*)\")|(DIGITO\\s+DIGITO\\s*\\*)|([A-Za-z0-9*(){}\\[\\]\"'\\\\;,.!@#$%^&+=~`|/_><-]+))");
-        String line = "";
-        int lineNumber = 0; // Track line number
-
-        while ((line = reader.readLine()) != null) {
-            lineNumber++; // Increment line number
-            Matcher m = p.matcher(line);
-
-            if (!m.matches()) {
-                int errorColumn = getErrorColumn(line, p);
-                System.out.println("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    boolean verificarActions(BufferedReader reader) throws Exception {
-        Pattern p = Pattern.compile("\\d+\\s*=\\s*'[A-Za-z0-9]+(?:'[A-Za-z0-9])'");
-        String line = "";
-        int lineNumber = 0; // Track line number
-
-        while ((line = reader.readLine()) != null) {
-            lineNumber++; // Increment line number
-            Matcher m = p.matcher(line);
-
-            if (!m.matches()) {
-                int errorColumn = getErrorColumn(line, p);
-                System.out.println("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    boolean verificarError(BufferedReader reader) throws Exception {
-        Pattern p = Pattern.compile("\\s*=\\s*(\\d+)");
-        String line = "";
-        int lineNumber = 0; // Track line number
-
-        while ((line = reader.readLine()) != null) {
-            lineNumber++; // Increment line number
-            Matcher m = p.matcher(line);
-
-            if (!m.matches()) {
-                int errorColumn = getErrorColumn(line, p);
-                System.out.println("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
-                return false;
-            }
-        }
-        return true;
-    }
-
 }
