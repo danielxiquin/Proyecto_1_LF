@@ -88,34 +88,70 @@ public class ValidacionDeExpresiones {
         return true;
     }
 
-
-
-
-
     boolean verificarActions(List<String> lines) {
         System.out.println("Debug: Verifying ACTIONS section.");
 
-        Pattern p = Pattern.compile("(\\d+\\s*=\\s*'[A-Za-z0-9]+(?:'[A-Za-z0-9])'|RESERVADAS\\(\\))");
+        // Pattern to match the RESERVADAS() declaration
+        Pattern reservadasPattern = Pattern.compile("RESERVADAS\\(\\)\\s*");
+
+        // Pattern to match action definitions like 18 = 'PROGRAM'
+        Pattern actionPattern = Pattern.compile("\\d+\\s*=\\s*'\\w+'\\s*");
+
+        boolean insideActionBlock = false; // Track whether we're inside an action block
 
         int lineNumber = 0;
         for (String line : lines) {
             lineNumber++;
             System.out.println("Debug: Reading line " + lineNumber + ": " + line);
 
-            Matcher m = p.matcher(line);
-            boolean isMatching = m.matches();
-            System.out.println("Debug: Matching result for line " + lineNumber + ": " + isMatching);
-
-            if (!isMatching) {
-                int errorColumn = getErrorColumn(line, p);
-                System.out.println("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
-                return false;
-            } else {
+            // Check for RESERVADAS() on the first line
+            if (lineNumber == 1) {
+                Matcher reservadasMatcher = reservadasPattern.matcher(line);
+                if (!reservadasMatcher.matches()) {
+                    System.out.println("Error in line " + lineNumber + ": " + line);
+                    return false;
+                }
                 System.out.println("Debug: Line " + lineNumber + " passed validation.");
+                continue;
+            }
+
+            // Check for the opening {
+            if (!insideActionBlock && line.trim().equals("{")) {
+                insideActionBlock = true;
+                System.out.println("Debug: Opening brace found.");
+                continue;
+            }
+
+            // If inside an action block, validate action definitions
+            if (insideActionBlock) {
+                if (line.trim().equals("}")) {
+                    System.out.println("Debug: Closing brace found. Action block ended.");
+                    insideActionBlock = false;  // End of block
+                    continue;
+                }
+
+                Matcher actionMatcher = actionPattern.matcher(line);
+                if (!actionMatcher.matches()) {
+                    int errorColumn = getErrorColumn(line, actionPattern);
+                    System.out.println("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
+                    return false;
+                } else {
+                    System.out.println("Debug: Line " + lineNumber + " passed validation.");
+                }
+            } else {
+                System.out.println("Error: Expected opening `{` at line " + lineNumber);
+                return false;
             }
         }
+
+        if (insideActionBlock) {
+            System.out.println("Error: Missing closing `}` for action block.");
+            return false;
+        }
+
         return true;
     }
+
 
     boolean verificarError(List<String> lines) {
         System.out.println("Debug: Verifying ERROR section.");
