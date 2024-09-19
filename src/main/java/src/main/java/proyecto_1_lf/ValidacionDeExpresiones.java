@@ -10,7 +10,11 @@ public class ValidacionDeExpresiones {
 
     boolean verificarSet(BufferedReader reader) throws Exception{
         //Colocar las expresion para validar SET
+<<<<<<< HEAD
         Pattern p = Pattern.compile("[a-zA-Z]");
+=======
+        Pattern p = Pattern.compile("\\s([A-Z]+)\\s*=\\s*('([A-Za-z_0-9])'(\\.\\.'([A-Za-z_0-9])')?)((\\s*\\+\\s*'([A-Za-z_0-9])'(\\.\\.'([A-Za-z_0-9])')?)*)?|\\s([A-Z]+)\\s*=\\s*CHR\\((\\d+)\\)\\.\\.CHR\\((\\d+)\\)");
+>>>>>>> origin/ruan
         String line = "";
 
         while ((line = reader.readLine()) != null) {
@@ -25,7 +29,11 @@ public class ValidacionDeExpresiones {
 
     boolean verificarTokens(BufferedReader reader) throws Exception{
         //Colocar las expresion para validar TOKENS
+<<<<<<< HEAD
         Pattern p = Pattern.compile("");
+=======
+        Pattern p = Pattern.compile("TOKEN\\s+(\\d+)\\s*=\\s*((LETRA\\s*(\\(\\s*LETRA\\s*\\|\\s*DIGITO\\s*\\)\\s*\\*)\\s*{\\s*RESERVADAS\\(\\)\\s*\\})|'('|\")'\\s*(CHARSET)\\s*'('|\")'\\s*\\|\\s*'('|\")'\\s*(CHARSET)\\s*'('|\")'|('([A-Za-z0-9*(){}\\[\\]\\'\"\\\\;,.!@#$%^&+=~`|/_><-])')+|(DIGITO)\\s+(DIGITO)\\s+\\*)");
+>>>>>>> origin/ruan
         String line = "";
 
         while ((line = reader.readLine()) != null) {
@@ -39,7 +47,11 @@ public class ValidacionDeExpresiones {
     }
     boolean verificarActions(BufferedReader reader)throws Exception{
         //Colocar las expresion para validar ACTIONS
+<<<<<<< HEAD
         Pattern p = Pattern.compile("");
+=======
+        Pattern p = Pattern.compile("\\d+\\s*=\\s*'[A-Za-z0-9]+(?:'[A-Za-z0-9]*)*'");
+>>>>>>> origin/ruan
         String line = "";
 
         while ((line = reader.readLine()) != null) {
@@ -54,7 +66,11 @@ public class ValidacionDeExpresiones {
 
     boolean verificarError(BufferedReader reader)throws Exception{
         //Colocar las expresion para validar ERROR
+<<<<<<< HEAD
         Pattern p = Pattern.compile("");
+=======
+        Pattern p = Pattern.compile("ERROR\\s*=\\s*(\\d+)");
+>>>>>>> origin/ruan
         String line = "";
 
         while ((line = reader.readLine()) != null) {
