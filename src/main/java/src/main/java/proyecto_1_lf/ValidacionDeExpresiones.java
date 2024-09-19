@@ -40,6 +40,12 @@ public class ValidacionDeExpresiones {
             System.out.println("Debug: Reading line " + lineNumber + ": " + line);
             logAsciiValues(line);  // Log ASCII values for debugging
 
+            // If the line is the start of another section, break the loop and return to the main function
+            if (line.trim().startsWith("TOKENS") || line.trim().startsWith("ACTIONS") || line.trim().startsWith("ERROR")) {
+                System.out.println("Debug: End of SETS section. Returning control.");
+                return true;
+            }
+
             // Remove all whitespace (spaces, tabs, etc.)
             String cleanedLine = removeWhitespace(line);
             System.out.println("Debug: Cleaned line: " + cleanedLine);
@@ -67,13 +73,11 @@ public class ValidacionDeExpresiones {
         }
         return true;
     }
+
     // Function to remove all whitespace from a line
     private String removeWhitespace(String line) {
         return line.replaceAll("\\s+", "");  // Replace all whitespace (spaces, tabs, etc.) with nothing
     }
-
-
-
 
     boolean verificarTokens(BufferedReader reader) throws Exception {
         Pattern p = Pattern.compile("\\s+(\\d+)\\s*=\\s*((LETRA\\s*\\(\\s*LETRA\\s*\\|\\s*DIGITO\\s*\\)\\s*\\)\\s*\\{\\s*RESERVADAS\\(\\)\\s*\\})|('(?:[^']*)')|(\"(?:[^\"]*)\")|(DIGITO\\s+DIGITO\\s*\\*)|([A-Za-z0-9*(){}\\[\\]\"'\\\\;,.!@#$%^&+=~`|/_><-]+))");
