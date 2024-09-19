@@ -9,6 +9,7 @@ import java.util.Map;
 
 public class ValidadorGramatica {
 
+    //hola
     public static void main(String[] args) throws Exception {
         BufferedReader reader = new BufferedReader(new FileReader("prueba_1-1.txt"));
         String readLine = "";
