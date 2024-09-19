@@ -60,7 +60,7 @@ public class ValidacionDeExpresiones {
         System.out.println("Debug: Verifying TOKENS section.");
 
         // Updated regular expression for TOKEN lines, including support for parentheses and functions
-        Pattern p = Pattern.compile("\\s*TOKEN\\s+(\\d+)\\s*=\\s*([A-Za-z0-9_'\"()*+?|\\s-]+|'([^']|'')*'|\"[^\"]*\"|\\([A-Za-z0-9_'\"\\s|*+?]+\\)|\\{\\s*[A-Za-z0-9_]+\\(\\)\\s*}|\\(\\s*[A-Za-z0-9_'\"\\s|*+?]+\\s*\\)\\s*)");
+        Pattern p = Pattern.compile("\\s*TOKEN\\s+(\\d+)\\s*=\\s*([A-Za-z0-9_'\"()*+?|\\s-]+|'([^']|'')*'|\"[^\"]*\"|\\([A-Za-z0-9_'\"\\s|*+?]+\\)|\\{\\s*[A-Za-z0-9_]+\\(\\)\\s*\\}|\\(\\s*[A-Za-z0-9_'\"\\s|*+?]+\\s*\\))*");
 
         int lineNumber = 0;
         for (String line : lines) {
