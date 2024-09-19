@@ -71,11 +71,18 @@ public class ValidacionDeExpresiones {
             boolean isMatching = m.matches();
             System.out.println("Debug: Matching result for line " + lineNumber + ": " + isMatching);
 
-            if (!isMatching) {
+            if (isMatching) {
+                // After regex match, check if parentheses/brackets/braces are balanced
+                String tokenExpression = line.split("=")[1].trim();  // Get the part after '='
+                if (!isBalanced(tokenExpression)) {
+                    System.out.println("Error in line " + lineNumber + ": Unbalanced parentheses, braces, or brackets.");
+                    return false;
+                } else {
+                    System.out.println("Debug: Line " + lineNumber + " passed validation.");
+                }
+            } else {
                 System.out.println("Error in line " + lineNumber + ": " + line);
                 return false;
-            } else {
-                System.out.println("Debug: Line " + lineNumber + " passed validation.");
             }
         }
         return true;
@@ -138,4 +145,39 @@ public class ValidacionDeExpresiones {
     private String removeWhitespace(String line) {
         return line.replaceAll("\\s+", "");  // Replace all whitespace (spaces, tabs, etc.) with nothing
     }
+
+    private boolean isBalanced(String expression) {
+        int parentheses = 0;
+        int curlyBraces = 0;
+        int squareBrackets = 0;
+        boolean insideSingleQuotes = false;
+
+        for (int i = 0; i < expression.length(); i++) {
+            char ch = expression.charAt(i);
+
+            // Toggle insideSingleQuotes flag when encountering a single quote
+            if (ch == '\'') {
+                insideSingleQuotes = !insideSingleQuotes;
+            }
+
+            // Only validate parentheses, braces, and brackets if not inside single quotes
+            if (!insideSingleQuotes) {
+                if (ch == '(') parentheses++;
+                else if (ch == ')') parentheses--;
+                if (ch == '{') curlyBraces++;
+                else if (ch == '}') curlyBraces--;
+                if (ch == '[') squareBrackets++;
+                else if (ch == ']') squareBrackets--;
+
+                // If at any point closing bracket comes before opening one
+                if (parentheses < 0 || curlyBraces < 0 || squareBrackets < 0) {
+                    return false;
+                }
+            }
+        }
+
+        // After the loop, all counts should be zero if balanced
+        return parentheses == 0 && curlyBraces == 0 && squareBrackets == 0;
+    }
+
 }
