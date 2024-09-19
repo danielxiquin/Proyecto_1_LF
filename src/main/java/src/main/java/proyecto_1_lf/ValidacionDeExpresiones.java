@@ -9,12 +9,10 @@ public class ValidacionDeExpresiones {
     // Method to get the column number of the first match failure
     private int getErrorColumn(String line, Pattern p) {
         Matcher m = p.matcher(line);
-        for (int i = 0; i < line.length(); i++) {
-            if (!m.find(i)) {
-                return i + 1; // Return the first column with an error (1-based index)
-            }
+        if (m.find()) {
+            return m.end(); // Return the end position of the last match (1-based index)
         }
-        return -1; // No error found
+        return 1; // Return the starting column (1-based index)
     }
 
     private void logAsciiValues(String line) {
@@ -55,7 +53,6 @@ public class ValidacionDeExpresiones {
         return true;
     }
 
-
     boolean verificarTokens(List<String> lines) {
         System.out.println("Debug: Verifying TOKENS section.");
 
@@ -81,7 +78,8 @@ public class ValidacionDeExpresiones {
                     System.out.println("Debug: Line " + lineNumber + " passed validation.");
                 }
             } else {
-                System.out.println("Error in line " + lineNumber + ": " + line);
+                int errorColumn = getErrorColumn(line, p);
+                System.out.println("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
                 return false;
             }
         }
@@ -108,7 +106,8 @@ public class ValidacionDeExpresiones {
             if (lineNumber == 1) {
                 Matcher reservadasMatcher = reservadasPattern.matcher(line);
                 if (!reservadasMatcher.matches()) {
-                    System.out.println("Error in line " + lineNumber + ": " + line);
+                    int errorColumn = getErrorColumn(line, reservadasPattern);
+                    System.out.println("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
                     return false;
                 }
                 System.out.println("Debug: Line " + lineNumber + " passed validation.");
@@ -151,7 +150,6 @@ public class ValidacionDeExpresiones {
 
         return true;
     }
-
 
     boolean verificarError(List<String> lines) {
         System.out.println("Debug: Verifying ERROR section.");
