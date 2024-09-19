@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 
 public class ValidacionDeExpresiones {
 
+
+    public static int lineNumber = 0;
     // Method to get the column number of the first match failure
     private int getErrorColumn(String line, Pattern p) {
         Matcher m = p.matcher(line);
@@ -28,7 +30,6 @@ public class ValidacionDeExpresiones {
 
         Pattern p = Pattern.compile("\\s*([A-Z_]+)\\s*=\\s*'([A-Za-z0-9_])'\\s*\\.\\.\\s*'([A-Za-z0-9_])'(\\s*\\+\\s*('([A-Za-z0-9_])'|('([A-Za-z0-9_])'\\s*\\.\\.\\s*'([A-Za-z0-9_])')))*\\s*|\\s*([A-Z_]+)\\s*=\\s*CHR\\(\\d+\\)\\s*\\.\\.\\s*CHR\\(\\d+\\)\\s*");
 
-        int lineNumber = 0;
         for (String line : lines) {
             lineNumber++;
             System.out.println("Debug: Reading line " + lineNumber + ": " + line);
@@ -50,6 +51,8 @@ public class ValidacionDeExpresiones {
                 System.out.println("Debug: Line " + lineNumber + " passed validation.");
             }
         }
+
+        
         return true;
     }
 
@@ -59,7 +62,6 @@ public class ValidacionDeExpresiones {
         // Updated regular expression for TOKEN lines, including support for parentheses and functions
         Pattern p = Pattern.compile("\\s*TOKEN\\s+(\\d+)\\s*=\\s*([A-Za-z0-9_'\"()*+?|\\s-]+|'([^']|'')*'|\"[^\"]*\"|\\([A-Za-z0-9_'\"\\s|*+?]+\\)|\\{\\s*[A-Za-z0-9_]+\\(\\)\\s*\\}|\\(\\s*[A-Za-z0-9_'\"\\s|*+?]+\\s*\\))*");
 
-        int lineNumber = 0;
         for (String line : lines) {
             lineNumber++;
             System.out.println("Debug: Reading line " + lineNumber + ": " + line);
@@ -97,21 +99,26 @@ public class ValidacionDeExpresiones {
 
         boolean insideActionBlock = false; // Track whether we're inside an action block
 
-        int lineNumber = 0;
+        int lineNumberAction = 0;
         for (String line : lines) {
             lineNumber++;
+            lineNumberAction++;
+
             System.out.println("Debug: Reading line " + lineNumber + ": " + line);
 
             // Check for RESERVADAS() on the first line
-            if (lineNumber == 1) {
+            if (lineNumberAction == 1) {
                 Matcher reservadasMatcher = reservadasPattern.matcher(line);
                 if (!reservadasMatcher.matches()) {
                     int errorColumn = getErrorColumn(line, reservadasPattern);
                     System.out.println("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
                     return false;
                 }
-                System.out.println("Debug: Line " + lineNumber + " passed validation.");
-                continue;
+                else{
+                    System.out.println("Debug: Line " + lineNumber + " passed validation.");
+                    continue;
+                }
+                
             }
 
             // Check for the opening {
@@ -156,7 +163,6 @@ public class ValidacionDeExpresiones {
 
         Pattern p = Pattern.compile("\\s*ERROR=\\s*(\\d+)");
 
-        int lineNumber = 0;
         for (String line : lines) {
             lineNumber++;
             System.out.println("Debug: Reading line " + lineNumber + ": " + line);

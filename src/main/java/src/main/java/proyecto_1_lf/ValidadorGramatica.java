@@ -10,7 +10,7 @@ import java.util.Map;
 public class ValidadorGramatica {
 
     public static void main(String[] args) throws Exception {
-        BufferedReader reader = new BufferedReader(new FileReader("GRAMATICA.txt"));
+        BufferedReader reader = new BufferedReader(new FileReader("prueba_1-1.txt"));
         String readLine = "";
 
         Map<String, List<String>> sections = new HashMap<>();
@@ -64,21 +64,25 @@ public class ValidadorGramatica {
 
         if (sections.containsKey("SETS")) {
             System.out.println("Debug: Validating SETS section.");
+            expresiones.lineNumber++;
             validacion = expresiones.verificarSet(sections.get("SETS"));
         }
 
         if (validacion && sections.containsKey("TOKENS")) {
             System.out.println("Debug: Validating TOKENS section.");
+            expresiones.lineNumber++;
             validacion = expresiones.verificarTokens(sections.get("TOKENS"));
         }
 
         if (validacion && sections.containsKey("ACTIONS")) {
             System.out.println("Debug: Validating ACTIONS section.");
+            expresiones.lineNumber++;
             validacion = expresiones.verificarActions(sections.get("ACTIONS"));
         }
 
         if (validacion && sections.containsKey("ERROR")) {
             System.out.println("Debug: Validating ERROR section.");
+            expresiones.lineNumber++;
             validacion = expresiones.verificarError(sections.get("ERROR"));
         }
 
