@@ -1,5 +1,5 @@
 SETS
-	LETRA = 'A'..'Z'+'a'..'z'+'_'
+	LETRA = 	'A'..'Z'+'a'..'z'+'_'
 	DIGITO = '0'..'9'
 	CHARSET = CHR(32)..CHR(254)
 TOKENS
@@ -54,6 +54,7 @@ TOKENS
 	TOKEN  53  = ':''='
 	TOKEN 3= LETRA ( LETRA | DIGITO )*   { RESERVADAS() }
 ACTIONS
+
 RESERVADAS()
 {
 	18 = 'PROGRAM'
@@ -78,5 +79,9 @@ RESERVADAS()
 	37 = 'CASE'
 	38 = 'BREAK'
 	39 = 'DOWNTO'
+}
+HOLA()
+{
+	
 }
 ERROR = 54

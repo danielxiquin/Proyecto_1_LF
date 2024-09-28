@@ -6,15 +6,25 @@ import java.util.regex.Pattern;
 
 public class ValidacionDeExpresiones {
 
+    public static int lineNumber = 1;
 
-    public static int lineNumber = 0;
     // Method to get the column number of the first match failure
-    private int getErrorColumn(String line, Pattern p) {
+    public int getErrorColumn(String line, Pattern p) {
         Matcher m = p.matcher(line);
-        if (m.find()) {
-            return m.end(); // Return the end position of the last match (1-based index)
+        String subcadena = "";
+        for (int i = 0; i <= line.length(); i++) {
+            subcadena = line.substring(0, i);
+            Matcher subMatcher = p.matcher(subcadena);
+            if (!subMatcher.matches() && !subMatcher.hitEnd()) {
+                subcadena = subcadena.substring(0, i-1);
+                long extraColumn = subcadena.chars().filter(c -> c == '\t').count() * 3;
+                return i + (int)extraColumn; // Regresar el índice donde falla
+            }
         }
-        return 1; // Return the starting column (1-based index)
+
+        long extraColumn = subcadena.chars().filter(c -> c == '\t').count() * 3;
+
+        return m.regionEnd() + (int) extraColumn + 1;
     }
 
     private void logAsciiValues(String line) {
@@ -28,7 +38,8 @@ public class ValidacionDeExpresiones {
     boolean verificarSet(List<String> lines) {
         System.out.println("Debug: Verifying SETS section.");
 
-        Pattern p = Pattern.compile("\\s*([A-Z_]+)\\s*=\\s*'([A-Za-z0-9_])'\\s*\\.\\.\\s*'([A-Za-z0-9_])'(\\s*\\+\\s*('([A-Za-z0-9_])'|('([A-Za-z0-9_])'\\s*\\.\\.\\s*'([A-Za-z0-9_])')))*\\s*|\\s*([A-Z_]+)\\s*=\\s*CHR\\(\\d+\\)\\s*\\.\\.\\s*CHR\\(\\d+\\)\\s*");
+        Pattern p = Pattern.compile(
+                "\\s*([A-Z_]+)\\s*=\\s*'([A-Za-z0-9_])'\\s*\\.\\.\\s*'([A-Za-z0-9_])'(\\s*\\+\\s*('([A-Za-z0-9_])'|('([A-Za-z0-9_])'\\s*\\.\\.\\s*'([A-Za-z0-9_])')))*\\s*|\\s*([A-Z_]+)\\s*=\\s*CHR\\(\\d+\\)\\s*\\.\\.\\s*CHR\\(\\d+\\)");
 
         for (String line : lines) {
             lineNumber++;
@@ -52,15 +63,16 @@ public class ValidacionDeExpresiones {
             }
         }
 
-        
         return true;
     }
 
     boolean verificarTokens(List<String> lines) {
         System.out.println("Debug: Verifying TOKENS section.");
 
-        // Updated regular expression for TOKEN lines, including support for parentheses and functions
-        Pattern p = Pattern.compile("\\s*TOKEN\\s+(\\d+)\\s*=\\s*([A-Za-z0-9_'\"()*+?|\\s-]+|'([^']|'')*'|\"[^\"]*\"|\\([A-Za-z0-9_'\"\\s|*+?]+\\)|\\{\\s*[A-Za-z0-9_]+\\(\\)\\s*\\}|\\(\\s*[A-Za-z0-9_'\"\\s|*+?]+\\s*\\))*");
+        // Updated regular expression for TOKEN lines, including support for parentheses
+        // and functions
+        Pattern p = Pattern.compile(
+                "\\s*TOKEN\\s+(\\d+)\\s*=\\s*([A-Za-z0-9_'\"()*+?|\\s-]+|'([^']|'')*'|\"[^\"]*\"|\\([A-Za-z0-9_'\"\\s|*+?]+\\)|\\{\\s*[A-Za-z0-9_]+\\(\\)\\s*\\}|\\(\\s*[A-Za-z0-9_'\"\\s|*+?]+\\s*\\))*");
 
         for (String line : lines) {
             lineNumber++;
@@ -72,9 +84,10 @@ public class ValidacionDeExpresiones {
 
             if (isMatching) {
                 // After regex match, check if parentheses/brackets/braces are balanced
-                String tokenExpression = line.split("=")[1].trim();  // Get the part after '='
+                String tokenExpression = line.split("=")[1].trim(); // Get the part after '='
                 if (!isBalanced(tokenExpression)) {
-                    System.out.println("Error in line " + lineNumber + ": Unbalanced parentheses, braces, or brackets.");
+                    System.out
+                            .println("Error in line " + lineNumber + ": Unbalanced parentheses, braces, or brackets.");
                     return false;
                 } else {
                     System.out.println("Debug: Line " + lineNumber + " passed validation.");
@@ -88,14 +101,18 @@ public class ValidacionDeExpresiones {
         return true;
     }
 
+    boolean verificarVariables                 (List<String> lines) {
+        return true;
+    }
+
     boolean verificarActions(List<String> lines) {
         System.out.println("Debug: Verifying ACTIONS section.");
 
         // Pattern to match the RESERVADAS() declaration
-        Pattern reservadasPattern = Pattern.compile("RESERVADAS\\(\\)\\s*");
+        Pattern reservadasPattern = Pattern.compile("(RESERVADAS\\(\\))|(\\w*\\s*())");
 
         // Pattern to match action definitions like 18 = 'PROGRAM'
-        Pattern actionPattern = Pattern.compile("\\d+\\s*=\\s*'\\w+'\\s*");
+        Pattern actionPattern = Pattern.compile("\\s*\\d+\\s*=\\s*'\\w+'");
 
         boolean insideActionBlock = false; // Track whether we're inside an action block
 
@@ -113,12 +130,11 @@ public class ValidacionDeExpresiones {
                     int errorColumn = getErrorColumn(line, reservadasPattern);
                     System.out.println("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
                     return false;
-                }
-                else{
+                } else {
                     System.out.println("Debug: Line " + lineNumber + " passed validation.");
                     continue;
                 }
-                
+
             }
 
             // Check for the opening {
@@ -132,7 +148,7 @@ public class ValidacionDeExpresiones {
             if (insideActionBlock) {
                 if (line.trim().equals("}")) {
                     System.out.println("Debug: Closing brace found. Action block ended.");
-                    insideActionBlock = false;  // End of block
+                    insideActionBlock = false; // End of block
                     continue;
                 }
 
@@ -183,7 +199,7 @@ public class ValidacionDeExpresiones {
     }
 
     private String removeWhitespace(String line) {
-        return line.replaceAll("\\s+", "");  // Replace all whitespace (spaces, tabs, etc.) with nothing
+        return line.replaceAll("\\s+", ""); // Replace all whitespace (spaces, tabs, etc.) with nothing
     }
 
     private boolean isBalanced(String expression) {
@@ -202,12 +218,18 @@ public class ValidacionDeExpresiones {
 
             // Only validate parentheses, braces, and brackets if not inside single quotes
             if (!insideSingleQuotes) {
-                if (ch == '(') parentheses++;
-                else if (ch == ')') parentheses--;
-                if (ch == '{') curlyBraces++;
-                else if (ch == '}') curlyBraces--;
-                if (ch == '[') squareBrackets++;
-                else if (ch == ']') squareBrackets--;
+                if (ch == '(')
+                    parentheses++;
+                else if (ch == ')')
+                    parentheses--;
+                if (ch == '{')
+                    curlyBraces++;
+                else if (ch == '}')
+                    curlyBraces--;
+                if (ch == '[')
+                    squareBrackets++;
+                else if (ch == ']')
+                    squareBrackets--;
 
                 // If at any point closing bracket comes before opening one
                 if (parentheses < 0 || curlyBraces < 0 || squareBrackets < 0) {

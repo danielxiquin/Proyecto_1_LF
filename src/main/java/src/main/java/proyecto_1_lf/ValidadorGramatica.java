@@ -6,26 +6,51 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ValidadorGramatica {
 
-    //hola
+    // hola
     public static void main(String[] args) throws Exception {
-        BufferedReader reader = new BufferedReader(new FileReader("prueba_1-1.txt"));
+
+        BufferedReader reader = new BufferedReader(new FileReader("GRAMATICA.txt"));
         String readLine = "";
 
-        Map<String, List<String>> sections = new HashMap<>();
-        List<String> currentSection = null;
-        String currentSectionName = "";
+        Pattern pattern = Pattern.compile("");
+        Matcher matcher = pattern.matcher("");
+
+
+        ValidacionDeExpresiones expresiones = new ValidacionDeExpresiones();
 
         // Read the file and classify each line based on the section
         while ((readLine = reader.readLine()) != null) {
 
-            // Skip empty lines
+
             if (readLine.trim().isEmpty()) {
+                expresiones.lineNumber++;
                 continue;
             }
 
+
+            if (pattern.compile("SETS").matcher(readLine).matches()) {
+                
+            }
+            else if (pattern.compile("TOKENS").matcher(readLine).matches()) {
+
+            }
+            else if (pattern.compile("ACTIONS").matcher(readLine).matches()) {
+
+            }
+            else if (pattern.compile("ERROR").matcher(readLine).matches()) {
+
+            }
+            else{
+                validationCamp(readLine,expresiones.lineNumber);
+            }
+
+
+            /*  
             // Determine if we are starting a new section
             if (readLine.trim().startsWith("SETS")) {
                 currentSectionName = "SETS";
@@ -52,14 +77,13 @@ public class ValidadorGramatica {
             // Add lines to the current section
             if (currentSection != null && !readLine.trim().startsWith("SETS") && !readLine.trim().startsWith("TOKENS")
                     && !readLine.trim().startsWith("ACTIONS") && !readLine.trim().startsWith("ERROR")) {
-                currentSection.add(readLine.trim());
-            }
+                currentSection.add(readLine);
+            }*/
         }
 
-        reader.close();
+        /*reader.close();
 
         // Now, pass each section to its validation method
-        ValidacionDeExpresiones expresiones = new ValidacionDeExpresiones();
 
         boolean validacion = true;
 
@@ -91,6 +115,25 @@ public class ValidadorGramatica {
             System.out.println("All sections passed validation.");
         } else {
             System.out.println("Validation failed.");
+        }*/
+    }
+
+    public static void validationCamp(String line, int lineNumber){
+        ValidacionDeExpresiones temp = new ValidacionDeExpresiones();
+        Pattern pattern = Pattern.compile("");
+        Matcher matcher = pattern.matcher(line);
+
+        if ((matcher = pattern.compile("SETS").matcher(line)).matches() || matcher.hitEnd()) {
+            throw new IllegalStateException("Error in line " + lineNumber + " at column " + temp.getErrorColumn(line, matcher.pattern()) + ": " + line);
+        }
+        else if ((pattern = pattern.compile("TOKENS")).matcher(line).hitEnd()) {
+            throw new IllegalStateException("Error in line " + lineNumber + " at column " + temp.getErrorColumn(line, matcher.pattern()) + ": " + line);
+        }
+        else if ((pattern = pattern.compile("ACTIONS")).matcher(line).hitEnd()) {
+            throw new IllegalStateException("Error in line " + lineNumber + " at column " + temp.getErrorColumn(line, matcher.pattern()) + ": " + line);
+        }
+        else if ((pattern = pattern.compile("ERROR")).matcher(line).hitEnd()) {
+            throw new IllegalStateException("Error in line " + lineNumber + " at column " + temp.getErrorColumn(line, matcher.pattern()) + ": " + line);
         }
     }
 }
