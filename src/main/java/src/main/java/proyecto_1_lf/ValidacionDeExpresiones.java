@@ -50,7 +50,7 @@ public class ValidacionDeExpresiones {
         System.out.println("Debug: Cleaned line: " + cleanedLine);
 
         Matcher m = p.matcher(cleanedLine);
-        boolean isMatching = m.matches();
+        boolean isMatching = m.find();
         System.out.println("Debug: Matching result for line " + lineNumber + ": " + isMatching);
 
         if (!isMatching) {
@@ -74,7 +74,7 @@ public class ValidacionDeExpresiones {
         System.out.println("Debug: Reading line " + lineNumber + ": " + line);
 
         Matcher m = p.matcher(line);
-        boolean isMatching = m.matches();
+        boolean isMatching = m.find();
         System.out.println("Debug: Matching result for line " + lineNumber + ": " + isMatching);
 
         if (isMatching) {
@@ -161,8 +161,7 @@ public class ValidacionDeExpresiones {
                 Matcher actionMatcher = actionPattern.matcher(line);
                 if (!actionMatcher.matches()) {
                     int errorColumn = getErrorColumn(line, actionPattern);
-                    System.out.println("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
-                    return false;
+                    throw new Exception("Error in line " + lineNumber + " at column " + errorColumn + ": " + line);
                 } else {
                     System.out.println("Debug: Line " + lineNumber + " passed validation.");
                 }

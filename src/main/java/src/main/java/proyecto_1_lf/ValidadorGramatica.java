@@ -9,7 +9,7 @@ public class ValidadorGramatica {
 
     // hola
     public static void main(String[] args) throws Exception {
-        BufferedReader reader = new BufferedReader(new FileReader("GRAMATICA.txt"));
+        BufferedReader reader = new BufferedReader(new FileReader("prueba_1-1.txt"));
         BufferedReader temp;
         String readLine = "";
 
